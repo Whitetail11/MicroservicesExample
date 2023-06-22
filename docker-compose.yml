@@ -1,0 +1,96 @@
+version: '3.7'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.8.9-management
+    hostname: "rabbitmq"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=password
+    networks:
+      - rabbitmqnet
+
+  api-gateway:
+    image: api-gateway:latest
+    build:
+      context: .
+      dockerfile: MicroservicesExample/Dockerfile
+    ports:
+      - "5001:5001"
+    restart: always
+    networks:
+      - rabbitmqnet
+    environment:
+     - ASPNETCORE_ENVIRONMENT=Development
+     - ASPNETCORE_URLS=http://+:5001
+    depends_on:
+      - rabbitmq
+
+  auth:
+    image: auth:latest
+    build:
+      context: .
+      dockerfile: MicroservicesExample.Auth/Dockerfile
+    ports:
+      - "5000:5000"
+    restart: always
+    networks:
+      - rabbitmqnet
+    environment:
+     - ASPNETCORE_ENVIRONMENT=Development
+     - ASPNETCORE_URLS=http://+:5000
+    depends_on:
+      - rabbitmq
+
+  order:
+    image: order:latest
+    build:
+      context: .
+      dockerfile: MicroservicesExample.Order/Dockerfile
+    ports:
+      - "5002:5002"
+    restart: always
+    networks:
+      - rabbitmqnet
+    environment:
+     - ASPNETCORE_ENVIRONMENT=Development
+     - ASPNETCORE_URLS=http://+:5002
+    depends_on:
+      - rabbitmq
+      - redis
+
+  product:
+    image: product:latest
+    build:
+      context: .
+      dockerfile: MicroservicesExample.Product/Dockerfile
+    ports:
+      - "5003:5003"
+    restart: always
+    networks:
+      - rabbitmqnet
+    environment:
+     - ASPNETCORE_ENVIRONMENT=Development
+     - ASPNETCORE_URLS=http://+:5003
+    depends_on:
+      - rabbitmq
+
+  redis:
+   image: redis:latest
+   container_name: redis
+   restart: always
+   networks:
+      - rabbitmqnet
+   ports:
+     - "6379:6379"
+
+volumes:
+  rabbitmqdata:
+
+networks:
+  rabbitmqnet:

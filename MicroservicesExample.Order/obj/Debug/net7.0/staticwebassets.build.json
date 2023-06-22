@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "/IC8dfJq/UGSBtIElPO8gnygaVen6XH0jiM/NsBn5TM=",
+  "Source": "MicroservicesExample.Order",
+  "BasePath": "_content/MicroservicesExample.Order",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
